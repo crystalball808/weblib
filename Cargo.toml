@@ -1,0 +1,10 @@
+[package]
+name = "weblib"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+iced = {version = "0.13", features = ["markdown", "highlighter"]}
+open = "5.3"
+rfd = "0.15.1"
+uuid = { version = "1.11.0", features = ["v4", "fast-rng"] }
