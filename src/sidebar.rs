@@ -1,5 +1,5 @@
 use iced::{
-    widget::{button, column, container, text, Column},
+    widget::{button, column, container, scrollable, text, Column},
     Element,
     Length::Fill,
     Theme,
@@ -24,15 +24,17 @@ impl Sidebar {
                 Tab::Library { id } => button(text(format!("Library {id}"))).into(),
             })
             .collect();
-        let tabs_column = Column::from_vec(tabs_column);
+        let tabs_column: Element<Message> =
+            scrollable(Column::from_vec(tabs_column).spacing(4)).into();
 
-        let content = column![library_button, tabs_column];
+        let content = column![library_button, tabs_column].spacing(8);
 
         container(content)
             .style(|theme: &Theme| {
                 let palette = theme.extended_palette();
                 container::Style::default().background(palette.background.weak.color)
             })
+            .padding(4)
             .height(Fill)
             .width(200)
             .into()
