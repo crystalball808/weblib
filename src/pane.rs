@@ -5,7 +5,10 @@ use iced::{
 };
 use std::fs;
 
-use crate::{tabs::Tab, Message};
+use crate::{
+    tabs::{Tab, TabHistoryEntry},
+    Message,
+};
 
 pub struct Pane;
 
@@ -16,8 +19,8 @@ impl Pane {
         }
         let active_tab = active_tab.unwrap();
 
-        match active_tab {
-            Tab::Library { .. } => {
+        match active_tab.active_entry() {
+            TabHistoryEntry::Library => {
                 let entries = match fs::read_dir(vault_path) {
                     Ok(entries) => entries,
                     Err(_) => return text("Failed to read directory").into(),

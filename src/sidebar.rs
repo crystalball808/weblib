@@ -6,7 +6,10 @@ use iced::{
 };
 use uuid::Uuid;
 
-use crate::{tabs::Tab, Message};
+use crate::{
+    tabs::{Tab, TabHistoryEntry},
+    Message,
+};
 
 pub struct Sidebar;
 
@@ -18,19 +21,19 @@ impl Sidebar {
 
         let tabs_column: Vec<Element<Message>> = tabs
             .iter()
-            .map(|tab| match tab {
-                Tab::Library { id } => {
-                    if active_tab_id.is_some() && *id == active_tab_id.unwrap() {
+            .map(|tab| match tab.active_entry() {
+                TabHistoryEntry::Library => {
+                    if active_tab_id.is_some() && tab.id == active_tab_id.unwrap() {
                         button(text("Library"))
                             .style(button::primary)
                             .width(Fill)
-                            .on_press(Message::SelectTab(*id))
+                            .on_press(Message::SelectTab(tab.id))
                             .into()
                     } else {
                         button(text("Library"))
                             .style(button::secondary)
                             .width(Fill)
-                            .on_press(Message::SelectTab(*id))
+                            .on_press(Message::SelectTab(tab.id))
                             .into()
                     }
                 }

@@ -59,9 +59,7 @@ impl App {
             }
             Message::CreateLibraryTab => {
                 if let Screen::Main { tabs, .. } = &mut self.screen {
-                    tabs.push(Tab::Library {
-                        id: uuid::Uuid::new_v4(),
-                    });
+                    tabs.push(Tab::new());
                 }
             }
             Message::SelectTab(tab_id) => {
@@ -87,7 +85,7 @@ impl App {
             } => {
                 let active_tab: Option<&Tab> = if let Some(active_tab_id) = active_tab_id {
                     tabs.iter().find(|tab| match tab {
-                        Tab::Library { id } => id == active_tab_id,
+                        Tab { id, .. } => id == active_tab_id,
                     })
                 } else {
                     None
