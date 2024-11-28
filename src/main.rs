@@ -1,32 +1,28 @@
 use iced::{
-    widget::{button, container, row, text, Column},
+    widget::{button, container, row, text},
     Element,
     Length::Fill,
-    Theme,
 };
 use rfd::FileDialog;
 use sidebar::Sidebar;
-use std::fs;
+use uuid::Uuid;
 
+mod pane;
 mod sidebar;
 mod tabs;
 
+use pane::Pane;
 use tabs::Tab;
 
 pub fn main() -> iced::Result {
-    iced::application("Weblib", App::update, App::view)
-        .theme(theme)
-        .run()
-}
-
-fn theme(_state: &App) -> Theme {
-    Theme::KanagawaLotus
+    iced::application("Weblib", App::update, App::view).run()
 }
 
 #[derive(Debug, Clone)]
 enum Message {
     OpenFilePicker,
     CreateLibraryTab,
+    SelectTab(Uuid),
 }
 
 #[derive(Default)]
@@ -36,7 +32,7 @@ enum Screen {
     Main {
         vault_path: String,
         tabs: Vec<Tab>,
-        sidebar: Sidebar,
+        active_tab_id: Option<Uuid>,
     },
 }
 
@@ -57,8 +53,8 @@ impl App {
 
                 self.screen = Screen::Main {
                     vault_path: path,
-                    sidebar: Sidebar::new(),
                     tabs: Vec::new(),
+                    active_tab_id: None,
                 };
             }
             Message::CreateLibraryTab => {
@@ -66,6 +62,11 @@ impl App {
                     tabs.push(Tab::Library {
                         id: uuid::Uuid::new_v4(),
                     });
+                }
+            }
+            Message::SelectTab(tab_id) => {
+                if let Screen::Main { active_tab_id, .. } = &mut self.screen {
+                    *active_tab_id = Some(tab_id);
                 }
             }
         }
@@ -81,23 +82,20 @@ impl App {
             .into(),
             Screen::Main {
                 vault_path,
-                sidebar,
                 tabs,
+                active_tab_id,
             } => {
-                let entries = match fs::read_dir(vault_path) {
-                    Ok(entries) => entries,
-                    Err(_) => return text("Failed to read directory").into(),
+                let active_tab: Option<&Tab> = if let Some(active_tab_id) = active_tab_id {
+                    tabs.iter().find(|tab| match tab {
+                        Tab::Library { id } => id == active_tab_id,
+                    })
+                } else {
+                    None
                 };
 
-                let items: Vec<Element<Message>> = entries
-                    .map(|entry| text(entry.unwrap().path().to_string_lossy().to_string()).into())
-                    .collect();
-
-                let column = Column::from_vec(items);
-
                 row![
-                    sidebar.view(&tabs),
-                    container(column).center_x(Fill).center_y(Fill)
+                    Sidebar::view(&tabs, *active_tab_id),
+                    Pane::view(vault_path, active_tab)
                 ]
                 .into()
             }

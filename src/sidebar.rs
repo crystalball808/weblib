@@ -4,16 +4,14 @@ use iced::{
     Length::Fill,
     Theme,
 };
+use uuid::Uuid;
 
 use crate::{tabs::Tab, Message};
 
 pub struct Sidebar;
 
 impl Sidebar {
-    pub fn new() -> Self {
-        Self
-    }
-    pub fn view(&self, tabs: &Vec<Tab>) -> Element<Message> {
+    pub fn view(tabs: &Vec<Tab>, active_tab_id: Option<Uuid>) -> Element<Message> {
         let library_button: Element<Message> = button(text("Library"))
             .on_press(Message::CreateLibraryTab)
             .into();
@@ -21,13 +19,29 @@ impl Sidebar {
         let tabs_column: Vec<Element<Message>> = tabs
             .iter()
             .map(|tab| match tab {
-                Tab::Library { id } => button(text(format!("Library {id}"))).into(),
+                Tab::Library { id } => {
+                    if active_tab_id.is_some() && *id == active_tab_id.unwrap() {
+                        button(text("Library"))
+                            .style(button::primary)
+                            .width(Fill)
+                            .on_press(Message::SelectTab(*id))
+                            .into()
+                    } else {
+                        button(text("Library"))
+                            .style(button::secondary)
+                            .width(Fill)
+                            .on_press(Message::SelectTab(*id))
+                            .into()
+                    }
+                }
             })
             .collect();
         let tabs_column: Element<Message> =
-            scrollable(Column::from_vec(tabs_column).spacing(4)).into();
+            scrollable(Column::from_vec(tabs_column).spacing(4).width(Fill))
+                .width(Fill)
+                .into();
 
-        let content = column![library_button, tabs_column].spacing(8);
+        let content = column![library_button, tabs_column].spacing(8).width(Fill);
 
         container(content)
             .style(|theme: &Theme| {
