@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use iced::{
     widget::{button, container, row, text},
     Element,
@@ -33,7 +35,7 @@ enum Screen {
     #[default]
     VaultSelect,
     Main {
-        vault_path: String,
+        vault_path: PathBuf,
         tabs: Vec<Tab>,
         active_tab_id: Option<Uuid>,
     },
@@ -47,12 +49,7 @@ impl App {
     fn update(&mut self, message: Message) {
         match message {
             Message::OpenFilePicker => {
-                let path = FileDialog::new()
-                    .pick_folder()
-                    .unwrap()
-                    .into_os_string()
-                    .into_string()
-                    .unwrap();
+                let path = FileDialog::new().pick_folder().unwrap();
 
                 self.screen = Screen::Main {
                     vault_path: path,

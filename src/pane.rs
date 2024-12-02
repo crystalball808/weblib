@@ -3,7 +3,7 @@ use iced::{
     Element,
     Length::Fill,
 };
-use std::fs;
+use std::{fs, path::PathBuf};
 
 use crate::{
     tabs::{Tab, TabHistoryEntry},
@@ -13,7 +13,7 @@ use crate::{
 pub struct Pane;
 
 impl Pane {
-    pub fn view<'a>(vault_path: &'a str, active_tab: Option<&Tab>) -> Element<'a, Message> {
+    pub fn view<'a>(vault_path: &'a PathBuf, active_tab: Option<&Tab>) -> Element<'a, Message> {
         if let None = active_tab {
             return container(text("No active tab")).into();
         }
