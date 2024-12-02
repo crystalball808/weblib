@@ -12,10 +12,12 @@ mod sidebar;
 mod tabs;
 
 use pane::Pane;
-use tabs::Tab;
+use tabs::{Tab, TabHistoryEntry};
+
+const APP_NAME: &str = "Weblib";
 
 pub fn main() -> iced::Result {
-    iced::application("Weblib", App::update, App::view).run()
+    iced::application(APP_NAME, App::update, App::view).run()
 }
 
 #[derive(Debug, Clone)]
@@ -23,6 +25,7 @@ enum Message {
     OpenFilePicker,
     CreateLibraryTab,
     SelectTab(Uuid),
+    NavigateTab(Uuid, TabHistoryEntry),
 }
 
 #[derive(Default)]
@@ -67,6 +70,12 @@ impl App {
                     *active_tab_id = Some(tab_id);
                 }
             }
+            Message::NavigateTab(tab_id, history_entry) => {
+                if let Screen::Main { tabs, .. } = &mut self.screen {
+                    let tab = tabs.iter_mut().find(|tab| tab.id == tab_id).unwrap();
+                    tab.navigate(history_entry);
+                }
+            }
         }
     }
     fn view(&self) -> Element<Message> {
@@ -83,7 +92,7 @@ impl App {
                 tabs,
                 active_tab_id,
             } => {
-                let active_tab: Option<&Tab> = if let Some(active_tab_id) = active_tab_id {
+                let active_tab = if let Some(active_tab_id) = active_tab_id {
                     tabs.iter().find(|tab| match tab {
                         Tab { id, .. } => id == active_tab_id,
                     })

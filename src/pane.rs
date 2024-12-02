@@ -1,5 +1,5 @@
 use iced::{
-    widget::{container, text, Column},
+    widget::{button, container, text, Column},
     Element,
     Length::Fill,
 };
@@ -26,12 +26,24 @@ impl Pane {
                     Err(_) => return text("Failed to read directory").into(),
                 };
                 let items: Vec<Element<Message>> = entries
-                    .map(|entry| text(entry.unwrap().path().to_string_lossy().to_string()).into())
+                    .map(|entry| {
+                        let path = entry.unwrap().path().to_string_lossy().to_string();
+                        button(text(path.clone()))
+                            .on_press(Message::NavigateTab(
+                                active_tab.id,
+                                TabHistoryEntry::File { path },
+                            ))
+                            .into()
+                    })
                     .collect();
 
                 let column = Column::from_vec(items);
 
                 container(column).center_x(Fill).center_y(Fill).into()
+            }
+            TabHistoryEntry::File { path } => {
+                let content = fs::read_to_string(path).unwrap();
+                container(text(content)).into()
             }
         }
     }

@@ -21,21 +21,24 @@ impl Sidebar {
 
         let tabs_column: Vec<Element<Message>> = tabs
             .iter()
-            .map(|tab| match tab.active_entry() {
-                TabHistoryEntry::Library => {
-                    if active_tab_id.is_some() && tab.id == active_tab_id.unwrap() {
-                        button(text("Library"))
-                            .style(button::primary)
-                            .width(Fill)
-                            .on_press(Message::SelectTab(tab.id))
-                            .into()
-                    } else {
-                        button(text("Library"))
-                            .style(button::secondary)
-                            .width(Fill)
-                            .on_press(Message::SelectTab(tab.id))
-                            .into()
-                    }
+            .map(|tab| {
+                let label = match tab.active_entry() {
+                    TabHistoryEntry::Library => "Library",
+                    TabHistoryEntry::File { .. } => "File",
+                };
+
+                if active_tab_id.is_some() && tab.id == active_tab_id.unwrap() {
+                    button(text(label))
+                        .style(button::primary)
+                        .width(Fill)
+                        .on_press(Message::SelectTab(tab.id))
+                        .into()
+                } else {
+                    button(text(label))
+                        .style(button::secondary)
+                        .width(Fill)
+                        .on_press(Message::SelectTab(tab.id))
+                        .into()
                 }
             })
             .collect();

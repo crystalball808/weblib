@@ -1,7 +1,9 @@
 use uuid::Uuid;
 
+#[derive(Debug, Clone)]
 pub enum TabHistoryEntry {
     Library,
+    File { path: String },
 }
 
 pub struct Tab {
