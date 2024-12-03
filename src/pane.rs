@@ -27,12 +27,16 @@ impl Pane {
                 };
                 let items: Vec<Element<Message>> = entries
                     .map(|entry| {
-                        let path = entry.unwrap().path().to_string_lossy().to_string();
-                        button(text(path.clone()))
-                            .on_press(Message::NavigateTab(
-                                active_tab.id,
-                                TabHistoryEntry::File { path },
-                            ))
+                        let entry = entry.unwrap();
+                        let path = entry.path();
+                        let metadata = entry.metadata().unwrap();
+                        let tab_history_entry = if metadata.is_dir() {
+                            TabHistoryEntry::Folder { path: path.clone() }
+                        } else {
+                            TabHistoryEntry::File { path: path.clone() }
+                        };
+                        button(text(path.into_os_string().into_string().unwrap()))
+                            .on_press(Message::NavigateTab(active_tab.id, tab_history_entry))
                             .into()
                     })
                     .collect();
@@ -44,6 +48,27 @@ impl Pane {
             TabHistoryEntry::File { path } => {
                 let content = fs::read_to_string(path).unwrap();
                 container(text(content)).into()
+            }
+            TabHistoryEntry::Folder { path } => {
+                let entries = match fs::read_dir(path) {
+                    Ok(entries) => entries,
+                    Err(_) => return text("Failed to read directory").into(),
+                };
+                let items: Vec<Element<Message>> = entries
+                    .map(|entry| {
+                        let path = entry.unwrap().path();
+                        button(text(path.clone().into_os_string().into_string().unwrap()))
+                            .on_press(Message::NavigateTab(
+                                active_tab.id,
+                                TabHistoryEntry::File { path },
+                            ))
+                            .into()
+                    })
+                    .collect();
+
+                let column = Column::from_vec(items);
+
+                container(column).center_x(Fill).center_y(Fill).into()
             }
         }
     }

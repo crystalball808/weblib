@@ -59,7 +59,7 @@ impl App {
             }
             Message::CreateLibraryTab => {
                 if let Screen::Main { tabs, .. } = &mut self.screen {
-                    tabs.push(Tab::new());
+                    tabs.push(Tab::default());
                 }
             }
             Message::SelectTab(tab_id) => {

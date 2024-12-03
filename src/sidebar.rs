@@ -22,9 +22,14 @@ impl Sidebar {
         let tabs_column: Vec<Element<Message>> = tabs
             .iter()
             .map(|tab| {
-                let label = match tab.active_entry() {
-                    TabHistoryEntry::Library => "Library",
-                    TabHistoryEntry::File { .. } => "File",
+                let label: String = match tab.active_entry() {
+                    TabHistoryEntry::Library => "Library".to_string(),
+                    TabHistoryEntry::File { path } => {
+                        path.file_name().unwrap().to_string_lossy().to_string()
+                    }
+                    TabHistoryEntry::Folder { path } => {
+                        path.file_name().unwrap().to_string_lossy().to_string()
+                    }
                 };
 
                 if active_tab_id.is_some() && tab.id == active_tab_id.unwrap() {

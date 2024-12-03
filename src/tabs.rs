@@ -1,9 +1,12 @@
+use std::path::PathBuf;
+
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
 pub enum TabHistoryEntry {
     Library,
-    File { path: String },
+    File { path: PathBuf },
+    Folder { path: PathBuf },
 }
 
 pub struct Tab {
@@ -12,14 +15,17 @@ pub struct Tab {
     active_entry_index: usize,
 }
 
-impl Tab {
-    pub fn new() -> Self {
+impl Default for Tab {
+    fn default() -> Self {
         Self {
             id: Uuid::new_v4(),
             history: vec![TabHistoryEntry::Library],
             active_entry_index: 0,
         }
     }
+}
+
+impl Tab {
     pub fn navigate(&mut self, new_entry: TabHistoryEntry) {
         self.history.push(new_entry);
         self.active_entry_index += 1;
