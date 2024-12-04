@@ -58,8 +58,16 @@ impl App {
                 };
             }
             Message::CreateLibraryTab => {
-                if let Screen::Main { tabs, .. } = &mut self.screen {
-                    tabs.push(Tab::default());
+                if let Screen::Main {
+                    tabs,
+                    active_tab_id,
+                    ..
+                } = &mut self.screen
+                {
+                    let new_tab = Tab::default();
+                    *active_tab_id = Some(new_tab.id);
+
+                    tabs.push(new_tab);
                 }
             }
             Message::SelectTab(tab_id) => {
