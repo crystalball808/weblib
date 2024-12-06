@@ -24,7 +24,7 @@ impl Sidebar {
             .map(|tab| {
                 let label: String = match tab.active_entry() {
                     TabHistoryEntry::Library => "Library".to_string(),
-                    TabHistoryEntry::File { path } => {
+                    TabHistoryEntry::File { path, .. } => {
                         path.file_name().unwrap().to_string_lossy().to_string()
                     }
                     TabHistoryEntry::Folder { path } => {

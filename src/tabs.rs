@@ -1,12 +1,24 @@
 use std::path::PathBuf;
 
+use iced::widget::text_editor;
 use uuid::Uuid;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum TabHistoryEntry {
     Library,
-    File { path: PathBuf },
-    Folder { path: PathBuf },
+    File {
+        path: PathBuf,
+        content: text_editor::Content,
+    },
+    Folder {
+        path: PathBuf,
+    },
+}
+
+#[derive(Debug, Clone)]
+pub enum TabNavigation {
+    File(PathBuf),
+    Folder(PathBuf),
 }
 
 pub struct Tab {
@@ -26,7 +38,15 @@ impl Default for Tab {
 }
 
 impl Tab {
-    pub fn navigate(&mut self, new_entry: TabHistoryEntry) {
+    pub fn navigate(&mut self, navigation: TabNavigation) {
+        let new_entry: TabHistoryEntry = match navigation {
+            TabNavigation::File(path) => TabHistoryEntry::File {
+                path,
+                content: text_editor::Content::new(),
+            },
+            TabNavigation::Folder(path) => TabHistoryEntry::Folder { path },
+        };
+
         self.history.push(new_entry);
         self.active_entry_index += 1;
     }

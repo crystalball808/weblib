@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use iced::{
     widget::{button, container, row, text},
     Element,
@@ -7,6 +5,7 @@ use iced::{
 };
 use rfd::FileDialog;
 use sidebar::Sidebar;
+use std::path::PathBuf;
 use uuid::Uuid;
 
 mod pane;
@@ -14,7 +13,7 @@ mod sidebar;
 mod tabs;
 
 use pane::Pane;
-use tabs::{Tab, TabHistoryEntry};
+use tabs::{Tab, TabNavigation};
 
 const APP_NAME: &str = "Weblib";
 
@@ -27,7 +26,7 @@ enum Message {
     OpenFilePicker,
     CreateLibraryTab,
     SelectTab(Uuid),
-    NavigateTab(Uuid, TabHistoryEntry),
+    NavigateTab(Uuid, TabNavigation),
 }
 
 #[derive(Default)]
@@ -45,6 +44,7 @@ enum Screen {
 struct App {
     screen: Screen,
 }
+
 impl App {
     fn update(&mut self, message: Message) {
         match message {

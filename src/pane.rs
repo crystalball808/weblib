@@ -1,19 +1,19 @@
 use iced::{
-    widget::{button, container, text, Column},
+    widget::{button, container, text, text_editor, Column},
     Element,
     Length::Fill,
 };
 use std::{fs, path::PathBuf};
 
 use crate::{
-    tabs::{Tab, TabHistoryEntry},
+    tabs::{Tab, TabHistoryEntry, TabNavigation},
     Message,
 };
 
 pub struct Pane;
 
 impl Pane {
-    pub fn view<'a>(vault_path: &'a PathBuf, active_tab: Option<&Tab>) -> Element<'a, Message> {
+    pub fn view<'a>(vault_path: &'a PathBuf, active_tab: Option<&'a Tab>) -> Element<'a, Message> {
         if let None = active_tab {
             return container(text("No active tab")).into();
         }
@@ -30,10 +30,10 @@ impl Pane {
                         let entry = entry.unwrap();
                         let path = entry.path();
                         let metadata = entry.metadata().unwrap();
-                        let tab_history_entry = if metadata.is_dir() {
-                            TabHistoryEntry::Folder { path: path.clone() }
+                        let tab_history_entry: TabNavigation = if metadata.is_dir() {
+                            TabNavigation::Folder(path.clone())
                         } else {
-                            TabHistoryEntry::File { path: path.clone() }
+                            TabNavigation::File(path.clone())
                         };
                         button(text(path.into_os_string().into_string().unwrap()))
                             .on_press(Message::NavigateTab(active_tab.id, tab_history_entry))
@@ -45,10 +45,7 @@ impl Pane {
 
                 container(column).center_x(Fill).center_y(Fill).into()
             }
-            TabHistoryEntry::File { path } => {
-                let content = fs::read_to_string(path).unwrap();
-                container(text(content)).into()
-            }
+            TabHistoryEntry::File { path: _, content } => container(text_editor(&content)).into(),
             TabHistoryEntry::Folder { path } => {
                 let entries = match fs::read_dir(path) {
                     Ok(entries) => entries,
@@ -60,7 +57,7 @@ impl Pane {
                         button(text(path.clone().into_os_string().into_string().unwrap()))
                             .on_press(Message::NavigateTab(
                                 active_tab.id,
-                                TabHistoryEntry::File { path },
+                                TabNavigation::File(path),
                             ))
                             .into()
                     })
