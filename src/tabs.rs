@@ -56,4 +56,7 @@ impl Tab {
     pub fn active_entry(&self) -> &TabHistoryEntry {
         return &self.history[self.active_entry_index];
     }
+    pub fn active_entry_mut(&mut self) -> &mut TabHistoryEntry {
+        return &mut self.history[self.active_entry_index];
+    }
 }

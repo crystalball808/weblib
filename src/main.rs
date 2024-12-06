@@ -1,11 +1,11 @@
 use iced::{
-    widget::{button, container, row, text},
+    widget::{button, container, row, text, text_editor},
     Element,
     Length::Fill,
 };
 use rfd::FileDialog;
 use sidebar::Sidebar;
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 use uuid::Uuid;
 
 mod pane;
@@ -13,7 +13,7 @@ mod sidebar;
 mod tabs;
 
 use pane::Pane;
-use tabs::{Tab, TabNavigation};
+use tabs::{Tab, TabHistoryEntry, TabNavigation};
 
 const APP_NAME: &str = "Weblib";
 
@@ -27,6 +27,7 @@ enum Message {
     CreateLibraryTab,
     SelectTab(Uuid),
     NavigateTab(Uuid, TabNavigation),
+    EditFile(Uuid, text_editor::Action),
 }
 
 #[derive(Default)]
@@ -79,6 +80,15 @@ impl App {
                 if let Screen::Main { tabs, .. } = &mut self.screen {
                     let tab = tabs.iter_mut().find(|tab| tab.id == tab_id).unwrap();
                     tab.navigate(history_entry);
+                }
+            }
+            Message::EditFile(tab_id, action) => {
+                if let Screen::Main { tabs, .. } = &mut self.screen {
+                    let tab = tabs.iter_mut().find(|tab| tab.id == tab_id).unwrap();
+                    if let TabHistoryEntry::File { content, path } = tab.active_entry_mut() {
+                        content.perform(action);
+                        fs::write(path, content.text()).unwrap();
+                    }
                 }
             }
         }

@@ -45,7 +45,10 @@ impl Pane {
 
                 container(column).center_x(Fill).center_y(Fill).into()
             }
-            TabHistoryEntry::File { path: _, content } => container(text_editor(&content)).into(),
+            TabHistoryEntry::File { path: _, content } => container(
+                text_editor(&content).on_action(|action| Message::EditFile(active_tab.id, action)),
+            )
+            .into(),
             TabHistoryEntry::Folder { path } => {
                 let entries = match fs::read_dir(path) {
                     Ok(entries) => entries,
