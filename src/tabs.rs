@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 
 use iced::widget::text_editor;
 use uuid::Uuid;
@@ -40,10 +40,13 @@ impl Default for Tab {
 impl Tab {
     pub fn navigate(&mut self, navigation: TabNavigation) {
         let new_entry: TabHistoryEntry = match navigation {
-            TabNavigation::File(path) => TabHistoryEntry::File {
-                path,
-                content: text_editor::Content::new(),
-            },
+            TabNavigation::File(path) => {
+                let content = fs::read_to_string(&path).expect("failed to read a file");
+                TabHistoryEntry::File {
+                    path,
+                    content: text_editor::Content::with_text(&content),
+                }
+            }
             TabNavigation::Folder(path) => TabHistoryEntry::Folder { path },
         };
 
