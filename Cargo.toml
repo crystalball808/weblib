@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+dirs = "5.0.1"
 iced = {version = "0.13", features = ["markdown", "highlighter"]}
 open = "5.3"
 rfd = "0.15.1"

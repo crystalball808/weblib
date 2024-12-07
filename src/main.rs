@@ -8,6 +8,7 @@ use sidebar::Sidebar;
 use std::{fs, path::PathBuf};
 use uuid::Uuid;
 
+mod config;
 mod pane;
 mod sidebar;
 mod tabs;
@@ -15,10 +16,9 @@ mod tabs;
 use pane::Pane;
 use tabs::{Tab, TabHistoryEntry, TabNavigation};
 
-const APP_NAME: &str = "Weblib";
-
 pub fn main() -> iced::Result {
-    iced::application(APP_NAME, App::update, App::view).run()
+    let _ = config::get_config();
+    iced::application(config::APP_NAME, App::update, App::view).run()
 }
 
 #[derive(Debug, Clone)]
