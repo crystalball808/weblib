@@ -26,8 +26,9 @@ pub fn get_config() -> Result<Config, Error> {
     let config_path = get_config_path().ok_or(Error::GetConfigPathFailed)?;
 
     if fs::exists(config_path)? {
-        let vault_path = Some(PathBuf::from("foo"));
-        Ok(Config { vault_path })
+        todo!();
+        // let vault_path = Some(PathBuf::from("foo"));
+        // Ok(Config { vault_path })
     } else {
         Ok(Config::default())
     }
