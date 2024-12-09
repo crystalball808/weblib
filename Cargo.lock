@@ -4968,6 +4968,8 @@ dependencies = [
  "iced",
  "open",
  "rfd",
+ "serde",
+ "toml",
  "uuid",
  "wry",
 ]
