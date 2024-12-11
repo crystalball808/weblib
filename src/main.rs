@@ -1,7 +1,9 @@
+use core::panic;
 use iced::{
     widget::{button, container, row, text, text_editor},
     Element,
     Length::Fill,
+    Task,
 };
 use rfd::FileDialog;
 use sidebar::Sidebar;
@@ -17,8 +19,11 @@ use pane::Pane;
 use tabs::{Tab, TabHistoryEntry, TabNavigation};
 
 pub fn main() -> iced::Result {
-    let _ = config::get_config();
-    iced::application(config::APP_NAME, App::update, App::view).run()
+    match config::get_config() {
+        Ok(config) => iced::application(config::APP_NAME, App::update, App::view)
+            .run_with(|| (App::new(config.vault_path), Task::none())),
+        Err(error) => panic!("{error}"),
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -30,9 +35,7 @@ enum Message {
     EditFile(Uuid, text_editor::Action),
 }
 
-#[derive(Default)]
 enum Screen {
-    #[default]
     VaultSelect,
     Main {
         vault_path: PathBuf,
@@ -41,12 +44,26 @@ enum Screen {
     },
 }
 
-#[derive(Default)]
 struct App {
     screen: Screen,
 }
 
 impl App {
+    fn new(vault_path: Option<PathBuf>) -> Self {
+        if let Some(vault_path) = vault_path {
+            Self {
+                screen: Screen::Main {
+                    vault_path,
+                    tabs: Vec::new(),
+                    active_tab_id: None,
+                },
+            }
+        } else {
+            Self {
+                screen: Screen::VaultSelect,
+            }
+        }
+    }
     fn update(&mut self, message: Message) {
         match message {
             Message::OpenFilePicker => {

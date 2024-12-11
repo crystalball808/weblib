@@ -17,7 +17,7 @@ fn get_config_path() -> Option<PathBuf> {
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    vault_path: Option<PathBuf>,
+    pub vault_path: Option<PathBuf>,
 }
 impl Default for Config {
     fn default() -> Self {
