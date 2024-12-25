@@ -50,7 +50,7 @@ impl Pane {
                 content,
                 preview,
                 md_items,
-                ..
+                path,
             } => {
                 let preview_checkbox: Element<Message> = checkbox("Preview", *preview)
                     .on_toggle(|preview| Message::TogglePreview(active_tab.id, preview))

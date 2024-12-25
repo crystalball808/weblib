@@ -7,7 +7,7 @@ use iced::{
 };
 use rfd::FileDialog;
 use sidebar::Sidebar;
-use std::{fs, path::PathBuf};
+use std::{collections::HashMap, fs, path::PathBuf};
 use uuid::Uuid;
 
 mod config;
@@ -37,12 +37,19 @@ enum Message {
     LinkClicked(markdown::Url),
 }
 
+struct FileBuffer {
+    content: text_editor::Content,
+    md_items: Vec<markdown::Item>,
+}
+type Buffers = HashMap<PathBuf, FileBuffer>;
+
 enum Screen {
     VaultSelect,
     Main {
         vault_path: PathBuf,
         tabs: Vec<Tab>,
         active_tab_id: Option<Uuid>,
+        buffers: Buffers,
     },
 }
 
@@ -58,6 +65,7 @@ impl App {
                     vault_path,
                     tabs: Vec::new(),
                     active_tab_id: None,
+                    buffers: HashMap::new(),
                 },
             }
         } else {
@@ -75,6 +83,7 @@ impl App {
                     vault_path: path,
                     tabs: Vec::new(),
                     active_tab_id: None,
+                    buffers: HashMap::new(),
                 };
             }
             Message::CreateLibraryTab => {
@@ -128,7 +137,7 @@ impl App {
                     }
                 }
             }
-            Message::LinkClicked(link) => {}
+            Message::LinkClicked(_link) => {}
         }
     }
     fn view(&self) -> Element<Message> {
@@ -144,6 +153,7 @@ impl App {
                 vault_path,
                 tabs,
                 active_tab_id,
+                buffers,
             } => {
                 let active_tab = if let Some(active_tab_id) = active_tab_id {
                     tabs.iter().find(|tab| match tab {
