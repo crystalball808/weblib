@@ -16,7 +16,7 @@ mod sidebar;
 mod tabs;
 
 use pane::Pane;
-use tabs::{Tab, TabHistoryEntry, TabNavigation};
+use tabs::{Tab, TabHistoryEntry, TabId, TabNavigation};
 
 pub fn main() -> iced::Result {
     match config::get_config() {
@@ -30,9 +30,10 @@ pub fn main() -> iced::Result {
 enum Message {
     OpenFilePicker,
     CreateLibraryTab,
-    SelectTab(Uuid),
-    NavigateTab(Uuid, TabNavigation),
-    EditFile(Uuid, text_editor::Action),
+    SelectTab(TabId),
+    NavigateTab(TabId, TabNavigation),
+    EditFile(TabId, text_editor::Action),
+    TogglePreview(TabId, bool),
 }
 
 enum Screen {
@@ -102,9 +103,22 @@ impl App {
             Message::EditFile(tab_id, action) => {
                 if let Screen::Main { tabs, .. } = &mut self.screen {
                     let tab = tabs.iter_mut().find(|tab| tab.id == tab_id).unwrap();
-                    if let TabHistoryEntry::File { content, path } = tab.active_entry_mut() {
+                    if let TabHistoryEntry::File {
+                        content,
+                        path,
+                        preview: false,
+                    } = tab.active_entry_mut()
+                    {
                         content.perform(action);
                         fs::write(path, content.text()).unwrap();
+                    }
+                }
+            }
+            Message::TogglePreview(tab_id, set_preview) => {
+                if let Screen::Main { tabs, .. } = &mut self.screen {
+                    let tab = tabs.iter_mut().find(|tab| tab.id == tab_id).unwrap();
+                    if let TabHistoryEntry::File { preview, .. } = tab.active_entry_mut() {
+                        *preview = set_preview;
                     }
                 }
             }

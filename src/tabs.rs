@@ -9,6 +9,7 @@ pub enum TabHistoryEntry {
     File {
         path: PathBuf,
         content: text_editor::Content,
+        preview: bool,
     },
     Folder {
         path: PathBuf,
@@ -21,8 +22,10 @@ pub enum TabNavigation {
     Folder(PathBuf),
 }
 
+pub type TabId = Uuid;
+
 pub struct Tab {
-    pub id: Uuid,
+    pub id: TabId,
     history: Vec<TabHistoryEntry>,
     active_entry_index: usize,
 }
@@ -45,6 +48,7 @@ impl Tab {
                 TabHistoryEntry::File {
                     path,
                     content: text_editor::Content::with_text(&content),
+                    preview: false,
                 }
             }
             TabNavigation::Folder(path) => TabHistoryEntry::Folder { path },

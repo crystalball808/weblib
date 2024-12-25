@@ -45,7 +45,7 @@ impl Pane {
 
                 container(column).center_x(Fill).center_y(Fill).into()
             }
-            TabHistoryEntry::File { path: _, content } => container(
+            TabHistoryEntry::File { content, .. } => container(
                 text_editor(&content).on_action(|action| Message::EditFile(active_tab.id, action)),
             )
             .into(),
