@@ -1,6 +1,6 @@
 use std::{fs, path::PathBuf};
 
-use iced::widget::text_editor;
+use iced::widget::{markdown, text_editor};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -10,6 +10,7 @@ pub enum TabHistoryEntry {
         path: PathBuf,
         content: text_editor::Content,
         preview: bool,
+        md_items: Vec<markdown::Item>,
     },
     Folder {
         path: PathBuf,
@@ -48,6 +49,7 @@ impl Tab {
                 TabHistoryEntry::File {
                     path,
                     content: text_editor::Content::with_text(&content),
+                    md_items: Vec::default(),
                     preview: false,
                 }
             }

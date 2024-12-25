@@ -1,7 +1,8 @@
 use iced::{
-    widget::{button, checkbox, column, container, text, text_editor, Column},
+    widget::{button, checkbox, column, container, markdown, text, text_editor, Column},
     Element,
     Length::Fill,
+    Theme,
 };
 use std::{fs, path::PathBuf};
 
@@ -46,18 +47,30 @@ impl Pane {
                 container(column).center_x(Fill).center_y(Fill).into()
             }
             TabHistoryEntry::File {
-                content, preview, ..
+                content,
+                preview,
+                md_items,
+                ..
             } => {
                 let preview_checkbox: Element<Message> = checkbox("Preview", *preview)
                     .on_toggle(|preview| Message::TogglePreview(active_tab.id, preview))
                     .into();
 
-                column![
-                    preview_checkbox,
+                let text_view: Element<Message> = if *preview {
+                    markdown::view(
+                        md_items,
+                        markdown::Settings::default(),
+                        markdown::Style::from_palette(Theme::TokyoNight.palette()),
+                    )
+                    .map(Message::LinkClicked)
+                    .into()
+                } else {
                     text_editor(&content)
-                        .on_action(|action| Message::EditFile(active_tab.id, action)),
-                ]
-                .into()
+                        .on_action(|action| Message::EditFile(active_tab.id, action))
+                        .into()
+                };
+
+                column![preview_checkbox, text_view].into()
             }
             TabHistoryEntry::Folder { path } => {
                 let entries = match fs::read_dir(path) {

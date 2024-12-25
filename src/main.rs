@@ -1,6 +1,6 @@
 use core::panic;
 use iced::{
-    widget::{button, container, row, text, text_editor},
+    widget::{button, container, markdown, row, text, text_editor},
     Element,
     Length::Fill,
     Task,
@@ -34,6 +34,7 @@ enum Message {
     NavigateTab(TabId, TabNavigation),
     EditFile(TabId, text_editor::Action),
     TogglePreview(TabId, bool),
+    LinkClicked(markdown::Url),
 }
 
 enum Screen {
@@ -107,10 +108,15 @@ impl App {
                         content,
                         path,
                         preview: false,
+                        md_items,
                     } = tab.active_entry_mut()
                     {
+                        let is_edit = action.is_edit();
                         content.perform(action);
-                        fs::write(path, content.text()).unwrap();
+                        if is_edit {
+                            *md_items = markdown::parse(&content.text()).collect();
+                            fs::write(path, content.text()).unwrap();
+                        }
                     }
                 }
             }
@@ -122,6 +128,7 @@ impl App {
                     }
                 }
             }
+            Message::LinkClicked(link) => {}
         }
     }
     fn view(&self) -> Element<Message> {
