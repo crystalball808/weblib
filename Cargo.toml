@@ -5,10 +5,11 @@ edition = "2021"
 
 [dependencies]
 dirs = "5.0.1"
-iced = { version = "0.13", features = ["markdown", "highlighter"] }
+iced = { version = "0.13", features = ["markdown", "highlighter", "tokio"] }
 open = "5.3"
 rfd = "0.15.1"
 serde = { version = "1.0.215", features = ["derive"] }
+tokio = { version = "1.42.0", features = ["fs"] }
 toml = "0.8.19"
 uuid = { version = "1.11.0", features = ["v4", "fast-rng"] }
 wry = "0.47.2"

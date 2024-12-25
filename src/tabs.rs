@@ -42,18 +42,20 @@ impl Default for Tab {
 }
 
 impl Tab {
-    pub fn navigate(&mut self, navigation: TabNavigation) {
+    pub fn navigate(&mut self, navigation: &TabNavigation) {
         let new_entry: TabHistoryEntry = match navigation {
             TabNavigation::File(path) => {
                 let content = fs::read_to_string(&path).expect("failed to read a file");
                 TabHistoryEntry::File {
-                    path,
+                    path: path.to_path_buf(),
                     content: text_editor::Content::with_text(&content),
                     md_items: Vec::default(),
                     preview: false,
                 }
             }
-            TabNavigation::Folder(path) => TabHistoryEntry::Folder { path },
+            TabNavigation::Folder(path) => TabHistoryEntry::Folder {
+                path: path.to_path_buf(),
+            },
         };
 
         self.history.push(new_entry);

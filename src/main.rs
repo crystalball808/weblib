@@ -35,12 +35,23 @@ enum Message {
     EditFile(TabId, text_editor::Action),
     TogglePreview(TabId, bool),
     LinkClicked(markdown::Url),
+    FileContentFetched(PathBuf, String),
 }
 
+#[derive(Debug)]
 struct FileBuffer {
     content: text_editor::Content,
     md_items: Vec<markdown::Item>,
 }
+impl FileBuffer {
+    fn new(content: &str) -> Self {
+        Self {
+            content: text_editor::Content::with_text(content),
+            md_items: markdown::parse(content).collect(),
+        }
+    }
+}
+
 type Buffers = HashMap<PathBuf, FileBuffer>;
 
 enum Screen {
@@ -74,7 +85,7 @@ impl App {
             }
         }
     }
-    fn update(&mut self, message: Message) {
+    fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::OpenFilePicker => {
                 let path = FileDialog::new().pick_folder().unwrap();
@@ -105,9 +116,28 @@ impl App {
                 }
             }
             Message::NavigateTab(tab_id, history_entry) => {
-                if let Screen::Main { tabs, .. } = &mut self.screen {
+                if let Screen::Main { tabs, buffers, .. } = &mut self.screen {
                     let tab = tabs.iter_mut().find(|tab| tab.id == tab_id).unwrap();
-                    tab.navigate(history_entry);
+
+                    tab.navigate(&history_entry);
+
+                    if let TabNavigation::File(file_path) = history_entry {
+                        if !buffers.contains_key(&file_path) {
+                            return Task::perform(
+                                fetch_file_content(file_path),
+                                |(file_path, content)| {
+                                    Message::FileContentFetched(file_path, content)
+                                },
+                            );
+                        }
+                    }
+                }
+            }
+            Message::FileContentFetched(file_path, content) => {
+                if let Screen::Main { buffers, .. } = &mut self.screen {
+                    let new_buffer = FileBuffer::new(&content);
+
+                    buffers.insert(file_path, new_buffer);
                 }
             }
             Message::EditFile(tab_id, action) => {
@@ -139,6 +169,7 @@ impl App {
             }
             Message::LinkClicked(_link) => {}
         }
+        Task::none()
     }
     fn view(&self) -> Element<Message> {
         match &self.screen {
@@ -155,6 +186,7 @@ impl App {
                 active_tab_id,
                 buffers,
             } => {
+                dbg!(&buffers);
                 let active_tab = if let Some(active_tab_id) = active_tab_id {
                     tabs.iter().find(|tab| match tab {
                         Tab { id, .. } => id == active_tab_id,
@@ -171,4 +203,10 @@ impl App {
             }
         }
     }
+}
+
+async fn fetch_file_content(path: PathBuf) -> (PathBuf, String) {
+    let content = tokio::fs::read_to_string(&path).await.unwrap();
+
+    (path, content)
 }
