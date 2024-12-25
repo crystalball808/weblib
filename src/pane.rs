@@ -1,5 +1,5 @@
 use iced::{
-    widget::{button, container, text, text_editor, Column},
+    widget::{button, checkbox, column, container, text, text_editor, Column},
     Element,
     Length::Fill,
 };
@@ -45,10 +45,20 @@ impl Pane {
 
                 container(column).center_x(Fill).center_y(Fill).into()
             }
-            TabHistoryEntry::File { content, .. } => container(
-                text_editor(&content).on_action(|action| Message::EditFile(active_tab.id, action)),
-            )
-            .into(),
+            TabHistoryEntry::File {
+                content, preview, ..
+            } => {
+                let preview_checkbox: Element<Message> = checkbox("Preview", *preview)
+                    .on_toggle(|preview| Message::TogglePreview(active_tab.id, preview))
+                    .into();
+
+                column![
+                    preview_checkbox,
+                    text_editor(&content)
+                        .on_action(|action| Message::EditFile(active_tab.id, action)),
+                ]
+                .into()
+            }
             TabHistoryEntry::Folder { path } => {
                 let entries = match fs::read_dir(path) {
                     Ok(entries) => entries,
