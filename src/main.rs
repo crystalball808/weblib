@@ -22,7 +22,7 @@ pub fn main() -> iced::Result {
     match config::get_config() {
         Ok(config) => iced::application(config::APP_NAME, App::update, App::view)
             .run_with(|| (App::new(config.vault_path), Task::none())),
-        Err(error) => panic!("Get config error:{error}"),
+        Err(error) => panic!("Got config error:{error}"),
     }
 }
 
