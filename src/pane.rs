@@ -1,7 +1,7 @@
 use iced::{
     widget::{button, checkbox, column, container, markdown, text, text_editor, Column},
     Element,
-    Length::Fill,
+    Length::{self, Fill},
     Theme,
 };
 use std::{fs, path::PathBuf};
@@ -20,7 +20,7 @@ impl Pane {
         buffers: &'a Buffers,
     ) -> Element<'a, Message> {
         if let None = active_tab {
-            return container(text("No active tab")).into();
+            return container(text("No active tab")).center(Length::Fill).into();
         }
         let active_tab = active_tab.unwrap();
 
@@ -53,7 +53,9 @@ impl Pane {
             TabHistoryEntry::File { preview, path, .. } => {
                 let buffer = buffers.get(path);
                 if buffer.is_none() {
-                    return container(text("No associated buffer")).into();
+                    return container(text("No associated buffer"))
+                        .center(Length::Fill)
+                        .into();
                 }
                 let buffer = buffer.unwrap();
 
