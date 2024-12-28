@@ -1,20 +1,12 @@
-use std::{fs, path::PathBuf};
+use std::path::PathBuf;
 
-use iced::widget::{markdown, text_editor};
 use uuid::Uuid;
 
 #[derive(Debug)]
 pub enum TabHistoryEntry {
     Library,
-    File {
-        path: PathBuf,
-        content: text_editor::Content,
-        preview: bool,
-        md_items: Vec<markdown::Item>,
-    },
-    Folder {
-        path: PathBuf,
-    },
+    File { path: PathBuf, preview: bool },
+    Folder { path: PathBuf },
 }
 
 #[derive(Debug, Clone)]
@@ -44,15 +36,10 @@ impl Default for Tab {
 impl Tab {
     pub fn navigate(&mut self, navigation: &TabNavigation) {
         let new_entry: TabHistoryEntry = match navigation {
-            TabNavigation::File(path) => {
-                let content = fs::read_to_string(&path).expect("failed to read a file");
-                TabHistoryEntry::File {
-                    path: path.to_path_buf(),
-                    content: text_editor::Content::with_text(&content),
-                    md_items: Vec::default(),
-                    preview: false,
-                }
-            }
+            TabNavigation::File(path) => TabHistoryEntry::File {
+                path: path.to_path_buf(),
+                preview: false,
+            },
             TabNavigation::Folder(path) => TabHistoryEntry::Folder {
                 path: path.to_path_buf(),
             },

@@ -141,20 +141,22 @@ impl App {
                 }
             }
             Message::EditFile(tab_id, action) => {
-                if let Screen::Main { tabs, .. } = &mut self.screen {
+                if let Screen::Main { tabs, buffers, .. } = &mut self.screen {
                     let tab = tabs.iter_mut().find(|tab| tab.id == tab_id).unwrap();
                     if let TabHistoryEntry::File {
-                        content,
                         path,
                         preview: false,
-                        md_items,
+                        ..
                     } = tab.active_entry_mut()
                     {
-                        let is_edit = action.is_edit();
-                        content.perform(action);
-                        if is_edit {
-                            *md_items = markdown::parse(&content.text()).collect();
-                            fs::write(path, content.text()).unwrap();
+                        let buffer = buffers.get_mut(path);
+                        if let Some(buffer) = buffer {
+                            let is_edit = action.is_edit();
+                            buffer.content.perform(action);
+                            if is_edit {
+                                buffer.md_items = markdown::parse(&buffer.content.text()).collect();
+                                fs::write(path, buffer.content.text()).unwrap();
+                            }
                         }
                     }
                 }
@@ -197,7 +199,7 @@ impl App {
 
                 row![
                     Sidebar::view(&tabs, *active_tab_id),
-                    Pane::view(vault_path, active_tab)
+                    Pane::view(vault_path, active_tab, buffers)
                 ]
                 .into()
             }

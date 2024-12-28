@@ -8,13 +8,17 @@ use std::{fs, path::PathBuf};
 
 use crate::{
     tabs::{Tab, TabHistoryEntry, TabNavigation},
-    Message,
+    Buffers, Message,
 };
 
 pub struct Pane;
 
 impl Pane {
-    pub fn view<'a>(vault_path: &'a PathBuf, active_tab: Option<&'a Tab>) -> Element<'a, Message> {
+    pub fn view<'a>(
+        vault_path: &'a PathBuf,
+        active_tab: Option<&'a Tab>,
+        buffers: &'a Buffers,
+    ) -> Element<'a, Message> {
         if let None = active_tab {
             return container(text("No active tab")).into();
         }
@@ -46,26 +50,27 @@ impl Pane {
 
                 container(column).center_x(Fill).center_y(Fill).into()
             }
-            TabHistoryEntry::File {
-                content,
-                preview,
-                md_items,
-                path,
-            } => {
+            TabHistoryEntry::File { preview, path, .. } => {
+                let buffer = buffers.get(path);
+                if buffer.is_none() {
+                    return container(text("No associated buffer")).into();
+                }
+                let buffer = buffer.unwrap();
+
                 let preview_checkbox: Element<Message> = checkbox("Preview", *preview)
                     .on_toggle(|preview| Message::TogglePreview(active_tab.id, preview))
                     .into();
 
                 let text_view: Element<Message> = if *preview {
                     markdown::view(
-                        md_items,
+                        &buffer.md_items,
                         markdown::Settings::default(),
                         markdown::Style::from_palette(Theme::TokyoNight.palette()),
                     )
                     .map(Message::LinkClicked)
                     .into()
                 } else {
-                    text_editor(&content)
+                    text_editor(&buffer.content)
                         .on_action(|action| Message::EditFile(active_tab.id, action))
                         .into()
                 };
