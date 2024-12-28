@@ -1,5 +1,5 @@
 use iced::{
-    widget::{button, checkbox, column, container, markdown, text, text_editor, Column},
+    widget::{button, column, container, markdown, text, text_editor, toggler, Column},
     Element,
     Length::{self, Fill},
     Theme,
@@ -60,7 +60,7 @@ impl Pane {
                     }
                 };
 
-                let preview_checkbox: Element<Message> = checkbox("Preview", *preview)
+                let preview_toggler: Element<Message> = toggler(*preview)
                     .on_toggle(|preview| Message::TogglePreview(active_tab.id, preview))
                     .into();
 
@@ -78,7 +78,7 @@ impl Pane {
                         .into()
                 };
 
-                column![preview_checkbox, text_view].into()
+                column![preview_toggler, text_view].into()
             }
             TabHistoryEntry::Folder { path } => {
                 let entries = match fs::read_dir(path) {
