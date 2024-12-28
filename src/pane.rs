@@ -51,13 +51,14 @@ impl Pane {
                 container(column).center_x(Fill).center_y(Fill).into()
             }
             TabHistoryEntry::File { preview, path, .. } => {
-                let buffer = buffers.get(path);
-                if buffer.is_none() {
-                    return container(text("No associated buffer"))
-                        .center(Length::Fill)
-                        .into();
-                }
-                let buffer = buffer.unwrap();
+                let buffer = match buffers.get(path) {
+                    Some(buffer) => buffer,
+                    None => {
+                        return container(text("No associated buffer"))
+                            .center(Length::Fill)
+                            .into();
+                    }
+                };
 
                 let preview_checkbox: Element<Message> = checkbox("Preview", *preview)
                     .on_toggle(|preview| Message::TogglePreview(active_tab.id, preview))
