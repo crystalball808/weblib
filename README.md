@@ -5,6 +5,6 @@ The note taking app with the integrated browser.
 Iced - GUI framework for Rust. Inspired by the Elm language.
 
 ## TO-DO List
-- [ ] Buffers
+- [x] Buffers
 - [ ] Webview
 - [ ] D&D
