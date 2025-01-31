@@ -1,8 +1,9 @@
 use core::panic;
 use iced::{
-    widget::{button, container, markdown, row, text, text_editor},
+    alignment::{Horizontal, Vertical},
+    widget::{button, container, markdown, row, stack, text, text_editor},
     Element,
-    Length::Fill,
+    Length::{self, Fill},
     Task,
 };
 use rfd::FileDialog;
@@ -175,13 +176,23 @@ impl App {
     }
     fn view(&self) -> Element<Message> {
         match &self.screen {
-            Screen::VaultSelect => container(row![
-                text("You need to set the path"),
-                button(text("Set mock path")).on_press(Message::OpenFilePicker)
-            ])
-            .center_x(Fill)
-            .center_y(Fill)
-            .into(),
+            Screen::VaultSelect => {
+                let base: Element<Message> = container(row![
+                    text("You need to set the path"),
+                    button(text("Set mock path")).on_press(Message::OpenFilePicker)
+                ])
+                .center_x(Fill)
+                .center_y(Fill)
+                .into();
+                let top: Element<Message> = container(text("haha!"))
+                    .align_x(Horizontal::Right)
+                    .align_y(Vertical::Bottom)
+                    .width(Length::Fill)
+                    .height(Length::Fill)
+                    .into();
+
+                stack![base, top].into()
+            }
             Screen::Main {
                 vault_path,
                 tabs,
