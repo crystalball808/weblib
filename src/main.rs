@@ -71,19 +71,18 @@ struct App {
 
 impl App {
     fn new(vault_path: Option<PathBuf>) -> Self {
-        if let Some(vault_path) = vault_path {
-            Self {
+        match vault_path {
+            Some(vault_path) => Self {
                 screen: Screen::Main {
                     vault_path,
                     tabs: Vec::new(),
                     active_tab_id: None,
                     buffers: HashMap::new(),
                 },
-            }
-        } else {
-            Self {
+            },
+            None => Self {
                 screen: Screen::VaultSelect,
-            }
+            },
         }
     }
     fn update(&mut self, message: Message) -> Task<Message> {
@@ -179,7 +178,7 @@ impl App {
             Screen::VaultSelect => {
                 let base: Element<Message> = container(row![
                     text("You need to set the path"),
-                    button(text("Set mock path")).on_press(Message::OpenFilePicker)
+                    button(text("Set path")).on_press(Message::OpenFilePicker)
                 ])
                 .center_x(Fill)
                 .center_y(Fill)
