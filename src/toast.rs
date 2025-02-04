@@ -4,7 +4,7 @@ use iced::{
 };
 use uuid::Uuid;
 
-use super::Message;
+use crate::Message;
 
 #[derive(Clone, Debug)]
 pub enum ToastVariant {
