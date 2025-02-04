@@ -6,6 +6,7 @@ use uuid::Uuid;
 
 use super::Message;
 
+#[derive(Clone, Debug)]
 pub enum ToastVariant {
     Info,
     Error,
@@ -13,7 +14,7 @@ pub enum ToastVariant {
 pub struct Toast {
     title: &'static str,
     variant: ToastVariant,
-    id: Uuid,
+    pub id: Uuid,
 }
 
 impl Toast {

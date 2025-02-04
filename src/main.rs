@@ -8,7 +8,7 @@ use iced::{
 };
 use rfd::FileDialog;
 use sidebar::Sidebar;
-use std::{collections::HashMap, fs, path::PathBuf};
+use std::{collections::HashMap, fs, path::PathBuf, time::Duration};
 use toast::{Toast, ToastVariant};
 use uuid::Uuid;
 
@@ -39,6 +39,8 @@ enum Message {
     TogglePreview(TabId, bool),
     LinkClicked(markdown::Url),
     FileContentFetched(PathBuf, String),
+    CreateToast(&'static str, ToastVariant),
+    CloseToast(Uuid),
 }
 
 #[derive(Debug)]
@@ -175,6 +177,18 @@ impl App {
                 }
             }
             Message::LinkClicked(_link) => {}
+            Message::CreateToast(title, toast_variant) => {
+                let new_toast = Toast::new(title, toast_variant);
+                let toast_id = new_toast.id.clone();
+
+                self.toasts.push(new_toast);
+                return Task::perform(toast_timeout(toast_id), Message::CloseToast);
+            }
+            Message::CloseToast(id) => {
+                if let Some(i) = self.toasts.iter().position(|toast| toast.id == id) {
+                    self.toasts.remove(i);
+                };
+            }
         }
         Task::none()
     }
@@ -222,6 +236,11 @@ impl App {
             }
         }
     }
+}
+
+async fn toast_timeout(id: Uuid) -> Uuid {
+    tokio::time::sleep(Duration::from_secs(3)).await;
+    id
 }
 
 async fn fetch_file_content(path: PathBuf) -> (PathBuf, String) {
