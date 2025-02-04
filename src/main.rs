@@ -95,13 +95,21 @@ impl App {
     fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::OpenFilePicker => {
-                let path = FileDialog::new().pick_folder().unwrap();
-
-                self.screen = Screen::Main {
-                    vault_path: path,
-                    tabs: Vec::new(),
-                    active_tab_id: None,
-                    buffers: HashMap::new(),
+                match FileDialog::new().pick_folder() {
+                    Some(path) => {
+                        self.screen = Screen::Main {
+                            vault_path: path,
+                            tabs: Vec::new(),
+                            active_tab_id: None,
+                            buffers: HashMap::new(),
+                        };
+                    }
+                    None => {
+                        return Task::done(Message::CreateToast(
+                            "Failed to pick a folder",
+                            ToastVariant::Error,
+                        ));
+                    }
                 };
             }
             Message::CreateLibraryTab => {
