@@ -1,7 +1,7 @@
 use core::panic;
 use iced::{
     alignment::{Horizontal, Vertical},
-    widget::{button, container, markdown, row, stack, text, text_editor},
+    widget::{button, container, markdown, row, stack, text, text_editor, Column},
     Element,
     Length::{self, Fill},
     Task,
@@ -9,12 +9,14 @@ use iced::{
 use rfd::FileDialog;
 use sidebar::Sidebar;
 use std::{collections::HashMap, fs, path::PathBuf};
+use toast::{Toast, ToastVariant};
 use uuid::Uuid;
 
 mod config;
 mod pane;
 mod sidebar;
 mod tabs;
+mod toast;
 
 use pane::Pane;
 use tabs::{Tab, TabHistoryEntry, TabId, TabNavigation};
@@ -67,6 +69,7 @@ enum Screen {
 
 struct App {
     screen: Screen,
+    toasts: Vec<Toast>,
 }
 
 impl App {
@@ -79,9 +82,11 @@ impl App {
                     active_tab_id: None,
                     buffers: HashMap::new(),
                 },
+                toasts: Vec::new(),
             },
             None => Self {
                 screen: Screen::VaultSelect,
+                toasts: vec![Toast::new("test toast", ToastVariant::Info)],
             },
         }
     }
@@ -183,7 +188,10 @@ impl App {
                 .center_x(Fill)
                 .center_y(Fill)
                 .into();
-                let top: Element<Message> = container(text("haha!"))
+                let toast_elems: Vec<Element<Message>> =
+                    self.toasts.iter().map(|toast| toast.view()).collect();
+
+                let top: Element<Message> = container(Column::from_vec(toast_elems))
                     .align_x(Horizontal::Right)
                     .align_y(Vertical::Bottom)
                     .width(Length::Fill)
@@ -198,7 +206,6 @@ impl App {
                 active_tab_id,
                 buffers,
             } => {
-                dbg!(&buffers);
                 let active_tab = if let Some(active_tab_id) = active_tab_id {
                     tabs.iter().find(|tab| match tab {
                         Tab { id, .. } => id == active_tab_id,
