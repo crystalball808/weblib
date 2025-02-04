@@ -11,15 +11,15 @@ pub enum ToastVariant {
     Error,
 }
 pub struct Toast {
-    title: String,
+    title: &'static str,
     variant: ToastVariant,
     id: Uuid,
 }
 
 impl Toast {
-    pub fn new(title: &str, variant: ToastVariant) -> Self {
+    pub fn new(title: &'static str, variant: ToastVariant) -> Self {
         Self {
-            title: title.to_owned(),
+            title,
             variant,
             id: Uuid::new_v4(),
         }
@@ -30,10 +30,11 @@ impl Toast {
             ToastVariant::Info => Color::from_rgb8(23, 23, 240),
             ToastVariant::Error => Color::from_rgb8(240, 23, 23),
         };
-        container(text(&self.title))
+        container(text(self.title))
             .style(move |_| container::Style {
                 border: Border {
                     color: border_color,
+                    width: 3.,
                     ..Default::default()
                 },
                 ..Default::default()
