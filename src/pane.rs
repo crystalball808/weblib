@@ -19,10 +19,11 @@ impl Pane {
         active_tab: Option<&'a Tab>,
         buffers: &'a Buffers,
     ) -> Element<'a, Message> {
-        if let None = active_tab {
+        let active_tab = if active_tab.is_some() {
+            active_tab.unwrap()
+        } else {
             return container(text("No active tab")).center(Length::Fill).into();
-        }
-        let active_tab = active_tab.unwrap();
+        };
 
         match active_tab.active_entry() {
             TabHistoryEntry::Library => {
