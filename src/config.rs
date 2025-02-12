@@ -1,5 +1,4 @@
 use core::fmt;
-use dirs;
 use serde::Deserialize;
 use std::{fs, io, path::PathBuf};
 use toml::{self, de};
@@ -15,14 +14,9 @@ fn get_config_path() -> Option<PathBuf> {
     Some(config_path)
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 pub struct Config {
     pub vault_path: Option<PathBuf>,
-}
-impl Default for Config {
-    fn default() -> Self {
-        Self { vault_path: None }
-    }
 }
 
 pub fn get_config() -> Result<Config, Error> {
@@ -43,25 +37,25 @@ pub fn get_config() -> Result<Config, Error> {
 #[derive(Debug)]
 pub enum Error {
     GetConfigPathFailed,
-    IoError(io::Error),
-    ParseError(de::Error),
+    Io(io::Error),
+    Parse(de::Error),
 }
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Error::GetConfigPathFailed => write!(f, "Failed to get the config path"),
-            Error::IoError(io_error) => write!(f, "Io Error: {}", io_error),
-            Error::ParseError(parse_error) => write!(f, "TOML Parse Error: {}", parse_error),
+            Error::Io(io_error) => write!(f, "Io Error: {}", io_error),
+            Error::Parse(parse_error) => write!(f, "TOML Parse Error: {}", parse_error),
         }
     }
 }
 impl From<io::Error> for Error {
     fn from(io_error: io::Error) -> Self {
-        Error::IoError(io_error)
+        Error::Io(io_error)
     }
 }
 impl From<de::Error> for Error {
     fn from(de_error: de::Error) -> Self {
-        Error::ParseError(de_error)
+        Error::Parse(de_error)
     }
 }

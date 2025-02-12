@@ -14,7 +14,7 @@ use crate::{
 pub struct Sidebar;
 
 impl Sidebar {
-    pub fn view(tabs: &Vec<Tab>, active_tab_id: Option<Uuid>) -> Element<Message> {
+    pub fn view(tabs: &[Tab], active_tab_id: Option<Uuid>) -> Element<Message> {
         let library_button: Element<Message> = button(text("Library"))
             .on_press(Message::CreateLibraryTab)
             .into();

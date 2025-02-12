@@ -19,8 +19,8 @@ impl Pane {
         active_tab: Option<&'a Tab>,
         buffers: &'a Buffers,
     ) -> Element<'a, Message> {
-        let active_tab = if active_tab.is_some() {
-            active_tab.unwrap()
+        let active_tab = if let Some(active_tab) = active_tab {
+            active_tab
         } else {
             return container(text("No active tab")).center(Length::Fill).into();
         };
@@ -72,7 +72,6 @@ impl Pane {
                         markdown::Style::from_palette(Theme::TokyoNight.palette()),
                     )
                     .map(Message::LinkClicked)
-                    .into()
                 } else {
                     text_editor(&buffer.content)
                         .on_action(|action| Message::EditFile(active_tab.id, action))

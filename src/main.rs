@@ -187,7 +187,7 @@ impl App {
             Message::LinkClicked(_link) => {}
             Message::CreateToast(title, toast_variant) => {
                 let new_toast = Toast::new(title, toast_variant);
-                let toast_id = new_toast.id.clone();
+                let toast_id = new_toast.id;
 
                 self.toasts.push(new_toast);
                 return Task::perform(toast_timeout(toast_id), Message::CloseToast);
@@ -229,15 +229,13 @@ impl App {
                 buffers,
             } => {
                 let active_tab = if let Some(active_tab_id) = active_tab_id {
-                    tabs.iter().find(|tab| match tab {
-                        Tab { id, .. } => id == active_tab_id,
-                    })
+                    tabs.iter().find(|tab| tab.id == *active_tab_id)
                 } else {
                     None
                 };
 
                 row![
-                    Sidebar::view(&tabs, *active_tab_id),
+                    Sidebar::view(tabs, *active_tab_id),
                     Pane::view(vault_path, active_tab, buffers)
                 ]
                 .into()
