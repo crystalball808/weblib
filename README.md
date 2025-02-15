@@ -6,10 +6,10 @@ Iced - GUI framework for Rust. Inspired by the Elm language.
 
 ## TO-DO List
 - [x] Buffers
-- [ ] Toast for notifications
+- [x] Toast for notifications
+- [ ] Webview
 - [ ] Persisted app state (tabs, navigation)
 - [ ] Watch directory content for change and update existing buffers
-- [ ] Webview
 - [ ] Tab history navigation
 - [ ] D&D
 ## Optional
