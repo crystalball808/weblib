@@ -7,6 +7,7 @@ use uuid::Uuid;
 use crate::Message;
 
 #[derive(Clone, Debug)]
+#[allow(dead_code)]
 pub enum ToastVariant {
     Info,
     Error,
@@ -41,7 +42,6 @@ impl Toast {
                     color: border_color,
                     width: 3.,
                     radius: 8.0.into(),
-                    ..Default::default()
                 },
                 background: Some(bg_color.into()),
                 ..Default::default()
