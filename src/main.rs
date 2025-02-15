@@ -4,7 +4,7 @@ use iced::{
     widget::{button, container, markdown, row, stack, text, text_editor, Column},
     Element,
     Length::{self, Fill},
-    Task,
+    Padding, Task,
 };
 use rfd::FileDialog;
 use sidebar::Sidebar;
@@ -88,7 +88,7 @@ impl App {
             },
             None => Self {
                 screen: Screen::VaultSelect,
-                toasts: vec![Toast::new("test toast", ToastVariant::Info)],
+                toasts: Vec::new(),
             },
         }
     }
@@ -213,12 +213,14 @@ impl App {
                 let toast_elems: Vec<Element<Message>> =
                     self.toasts.iter().map(|toast| toast.view()).collect();
 
-                let top: Element<Message> = container(Column::from_vec(toast_elems))
-                    .align_x(Horizontal::Right)
-                    .align_y(Vertical::Bottom)
-                    .width(Length::Fill)
-                    .height(Length::Fill)
-                    .into();
+                let top: Element<Message> =
+                    container(Column::from_vec(toast_elems).align_x(Horizontal::Right))
+                        .padding(Padding::default().right(8.).bottom(8.))
+                        .align_x(Horizontal::Right)
+                        .align_y(Vertical::Bottom)
+                        .width(Length::Fill)
+                        .height(Length::Fill)
+                        .into();
 
                 stack![base, top].into()
             }

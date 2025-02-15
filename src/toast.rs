@@ -31,15 +31,22 @@ impl Toast {
             ToastVariant::Info => Color::from_rgb8(23, 23, 240),
             ToastVariant::Error => Color::from_rgb8(240, 23, 23),
         };
+        let bg_color = match self.variant {
+            ToastVariant::Info => Color::from_rgb8(60, 60, 210),
+            ToastVariant::Error => Color::from_rgb8(200, 60, 60),
+        };
         container(text(self.title))
             .style(move |_| container::Style {
                 border: Border {
                     color: border_color,
                     width: 3.,
+                    radius: 8.0.into(),
                     ..Default::default()
                 },
+                background: Some(bg_color.into()),
                 ..Default::default()
             })
+            .padding(16.)
             .into()
     }
 }
