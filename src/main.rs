@@ -1,4 +1,3 @@
-use core::panic;
 use iced::{
     alignment::{Horizontal, Vertical},
     widget::{button, container, markdown, row, stack, text, text_editor, Column},
@@ -126,9 +125,10 @@ impl App {
                 }
             }
             Message::SelectTab(tab_id) => {
-                if let Screen::Main { active_tab_id, .. } = &mut self.screen {
-                    *active_tab_id = Some(tab_id);
-                }
+                let Screen::Main { active_tab_id, .. } = &mut self.screen else {
+                    panic!("The screen should be Screen::Main");
+                };
+                *active_tab_id = Some(tab_id);
             }
             Message::NavigateTab(tab_id, history_entry) => {
                 if let Screen::Main { tabs, buffers, .. } = &mut self.screen {
