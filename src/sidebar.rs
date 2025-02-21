@@ -1,14 +1,14 @@
 use iced::{
-    widget::{button, column, container, scrollable, text, Column},
     Element,
     Length::Fill,
     Theme,
+    widget::{Column, button, column, container, scrollable, text},
 };
 use uuid::Uuid;
 
 use crate::{
-    tabs::{Tab, TabHistoryEntry},
     Message,
+    tabs::{Tab, TabHistoryEntry},
 };
 
 pub struct Sidebar;

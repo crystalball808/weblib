@@ -1,6 +1,6 @@
 use iced::{
-    widget::{container, text},
     Border, Color, Element,
+    widget::{container, text},
 };
 use uuid::Uuid;
 

@@ -1,14 +1,14 @@
 use iced::{
-    widget::{button, column, container, markdown, text, text_editor, toggler, Column},
     Element,
     Length::{self, Fill},
     Theme,
+    widget::{Column, button, column, container, markdown, text, text_editor, toggler},
 };
 use std::{fs, path::PathBuf};
 
 use crate::{
-    tabs::{Tab, TabHistoryEntry, TabNavigation},
     Buffers, Message,
+    tabs::{Tab, TabHistoryEntry, TabNavigation},
 };
 
 pub struct Pane;

@@ -1,9 +1,9 @@
 use iced::{
-    alignment::{Horizontal, Vertical},
-    widget::{button, container, markdown, row, stack, text, text_editor, Column},
     Element,
     Length::{self, Fill},
     Padding, Task,
+    alignment::{Horizontal, Vertical},
+    widget::{Column, button, container, markdown, row, stack, text, text_editor},
 };
 use rfd::FileDialog;
 use sidebar::Sidebar;
